@@ -5,7 +5,6 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
   experimental: {
-    serverActions: true,
     optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
     serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
   },

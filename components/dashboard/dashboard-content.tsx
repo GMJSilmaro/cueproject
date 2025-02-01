@@ -94,6 +94,7 @@ export function DashboardContent({
   const [isLoading, setIsLoading] = useState(false);
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"recent" | "popular" | "trending">("recent");
   const [activeFilters, setActiveFilters] = useState<{
     duration?: "short" | "medium" | "long";
     type?: "remix" | "original" | "live";
