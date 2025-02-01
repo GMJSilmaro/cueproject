@@ -5,17 +5,15 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
   experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'https://cueprojectdjs.vercel.app']
-    },
+    serverActions: true,
     optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
     serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
   },
+  output: 'standalone',
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = [...(config.externals || []), '@prisma/client', 'bcrypt'];
     }
-    config.resolve.alias['@radix-ui/react-select'] = new URL('./node_modules/@radix-ui/react-select', import.meta.url).pathname;
     return config;
   },
   images: {

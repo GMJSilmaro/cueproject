@@ -2,10 +2,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
 import type { Session } from "next-auth";
 import { prisma } from "@/lib/db";
-import type { ExtendedProfile } from "@/types";
+import type { ExtendedMix, ExtendedProfile } from "@/types";
 import { redirect } from "next/navigation";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
-import type { Mix } from "@/types";
+
 
 // Mock data - Replace with real data from your API
 const mixFeed = [
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
       session={session}
       allUsers={allUsers}
       featuredDJs={featuredDJs}
-      mixFeed={mixFeed as Mix[]}
+      mixFeed={mixFeed as ExtendedMix[]}
       genres={genres}
       totalUsers={totalUsers}
       totalDJs={totalDJs}
