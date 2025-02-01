@@ -9,15 +9,19 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'https://cueprojectdjs.vercel.app/']
-    }
+      allowedOrigins: ['localhost:3000', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'https://cueprojectdjs.vercel.app']
+    },
+    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = [...(config.externals || []), '@prisma/client', 'bcrypt'];
+    }
     config.resolve.alias['@radix-ui/react-select'] = path.resolve(__dirname, 'node_modules/@radix-ui/react-select');
     return config;
   },
   images: {
-    domains: ['picsum.photos', 'api.dicebear.com', 'lh3.googleusercontent.com'],
+    domains: ['picsum.photos', 'api.dicebear.com', 'lh3.googleusercontent.com', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -27,6 +31,7 @@ const nextConfig: NextConfig = {
     ],
   },
   output: 'standalone',
+  poweredByHeader: false,
 };
 
 export default nextConfig;
