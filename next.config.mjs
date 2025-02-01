@@ -25,7 +25,13 @@ const nextConfig = {
         pathname: '/a/**',
       },
     ],
-  }
+  },
+  // Ensure CSS/SCSS modules are handled properly
+  sassOptions: {
+    includePaths: ['./styles'],
+  },
+  // Enable source maps in production for better debugging
+  productionBrowserSourceMaps: true,
 };
 
 export default nextConfig; 
