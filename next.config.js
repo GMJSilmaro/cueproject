@@ -7,8 +7,7 @@ const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'https://cueprojectdjs.vercel.app']
-    },
-    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
+    }
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -27,7 +26,6 @@ const nextConfig = {
       },
     ],
   },
-  output: 'standalone',
   poweredByHeader: false,
 };
 
