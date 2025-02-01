@@ -9,6 +9,8 @@ import type { ExtendedProfile } from "@/types";
 import { ShareButton } from "@/components/dj/share-button";
 import Image from "next/image";
 import type { Session } from "next-auth";
+import { toast } from "sonner";
+import { useState } from "react";
 
 // Helper function to get valid image source or null
 function getValidImageSrc(src: string | null | undefined, defaultSrc: string): string {
@@ -24,7 +26,8 @@ interface DJProfileProps {
 }
 
 export function DJProfile({ profile, session }: DJProfileProps) {
-  const isFollowing = session?.user?.id ? profile.followers.includes(session.user.id) : false;
+  const [isFollowing, setIsFollowing] = useState(session?.user?.id ? profile.followers.includes(session.user.id) : false);
+  const [followersCount, setFollowersCount] = useState(profile.followers.length);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -62,16 +65,34 @@ export function DJProfile({ profile, session }: DJProfileProps) {
               
               <div className="flex items-center gap-4 mb-2">
                 {session?.user?.id !== profile.userId && (
-                  <form action={`/api/profile/${profile.userId}/follow`} method="POST">
-                    <Button 
-                      variant={isFollowing ? "outline" : "default"}
-                      className="gap-2"
-                      type="submit"
-                    >
-                      <Users className="h-4 w-4" />
-                      {isFollowing ? 'Following' : 'Follow'}
-                    </Button>
-                  </form>
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/profile/${profile.userId}/follow`, {
+                          method: 'POST',
+                        });
+                        
+                        if (!res.ok) throw new Error();
+                        
+                        const data = await res.json();
+                        setIsFollowing(data.following);
+                        setFollowersCount(data.followersCount);
+                        
+                        toast.success(data.following ? 
+                          `You are now following ${profile.username}` : 
+                          `You have unfollowed ${profile.username}`
+                        );
+                      } catch (error) {
+                        console.error('Follow action failed:', error);
+                        toast.error('Failed to follow user. Please try again.');
+                      }
+                    }}
+                    variant={isFollowing ? "outline" : "default"}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </Button>
                 )}
                 <ShareButton username={profile.username} />
               </div>
@@ -98,7 +119,7 @@ export function DJProfile({ profile, session }: DJProfileProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Followers</p>
-                  <p className="text-2xl font-bold">{profile.followers.length}</p>
+                  <p className="text-2xl font-bold">{followersCount}</p>
                 </div>
                 <Users className="h-8 w-8 text-red-500 opacity-20" />
               </div>
@@ -206,7 +227,7 @@ export function DJProfile({ profile, session }: DJProfileProps) {
           <h2 className="text-2xl font-bold mb-6">Recent Mixes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {profile.user.mixes.map((mix) => (
-              <MixCard key={mix.id} mix={mix} />
+              <MixCard key={mix.id} mix={mix} onLike={() => {}} onComment={() => {}} onShare={() => {}} />
             ))}
           </div>
         </div>

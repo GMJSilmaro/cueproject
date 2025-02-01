@@ -12,7 +12,7 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-medium text-red-600 hover:text-red-500">
+            <Link href="./register" className="font-medium text-red-600 hover:text-red-500">
               Sign up for free
             </Link>
           </p>

@@ -1,4 +1,4 @@
-import { User, Profile, Mix } from "@prisma/client";
+import { User, Profile, Mix, Like, Comment } from "@prisma/client";
 import { Session } from "next-auth";
 
 declare module "next-auth" {
@@ -12,7 +12,7 @@ declare module "next-auth" {
   }
 }
 
-export interface ExtendedProfile extends Profile {
+export interface ExtendedProfile {
   user: ExtendedUser;
   followers: string[];
   following: string[];
@@ -31,6 +31,12 @@ export interface ExtendedProfile extends Profile {
   mixes: Mix[];
 }
 
+export enum Role {
+  ADMIN = 'ADMIN',
+  DJ = 'DJ',
+  USER = 'USER'
+}
+
 export interface ExtendedUser extends User {
   id: string;
   name: string | null;
@@ -38,30 +44,90 @@ export interface ExtendedUser extends User {
   emailVerified: Date | null;
   image: string | null;
   password: string | null;
-  role: "USER" | "DJ";
+  role: Role;
   createdAt: Date;
   updatedAt: Date;
   mixes: Mix[];
+  verified: boolean;
+  coverImage: string | null;
+  followers: string[];
+  following: string[];
+  bio: string | null;
+  genre: string[];
+  location: string | null;
+  equipment: string | null;
+  experience: string | null;
+  socialLinks: Record<string, string> | null;
+  mixes: Mix[];
+  role: Role;
+  comments: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  user: {
+    id: string;
+    name: string;
+    image: string | null;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  replies?: Comment[];
+  likes?: string[];
+  parentId?: string;
 }
 
 export interface ExtendedMix extends Mix {
-  id: number;
+  id: string;
   title: string;
-  description: string;
+  description: string | null;
   coverImage: string | null;
   audioUrl: string;
-  duration: string;
-  plays: string;
-  likes: number;
-  comments: number;
+  duration: number;
+  plays: number;
+  likes: Like[];
+  comments: Comment[];
+  user: ExtendedUser;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  isLiked: boolean;
+  likesCount: number;
+  commentsCount: number;
+  formattedDuration: string;
+  _count: {
+    likes: number;
+    comments: number;
+  };
+}
+
+export interface FormattedMix {
+  id: string;
+  title: string;
+  description: string | null;
+  audioUrl: string;
+  coverUrl: string | null;
+  genre: string[];
+  duration: number;
+  plays: number;
+  isPublic: boolean;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  comments: Comment[];
   dj: {
     id: string;
     name: string;
     image: string | null;
     verified: boolean;
+    coverImage: string | null;
   };
-  tags: string[];
+  isLiked: boolean;
+  likesCount: number;
+  commentsCount: number;
+  formattedDuration: string;
 }
-
 
 export { Mix };

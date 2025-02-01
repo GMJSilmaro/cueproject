@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { Logo } from "./logo";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { 
+  Bars3Icon, 
+  XMarkIcon,
+  CalendarIcon,
+  NewspaperIcon,
+  QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon,
+  BookOpenIcon,
+  RocketLaunchIcon,
+  UserGroupIcon,
+  ChartBarIcon
+} from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from 'next/navigation';
@@ -10,6 +21,18 @@ import { usePathname } from 'next/navigation';
 interface NavigationProps {
   excludePaths?: string[];
 }
+
+const menuItems = [
+  { name: 'Features', href: '/#features', icon: RocketLaunchIcon },
+  { name: 'Pricing', href: '/#pricing', icon: ChartBarIcon },
+  { name: 'DJs', href: '/djs', icon: UserGroupIcon },
+  { name: 'Events', href: '/events', icon: CalendarIcon },
+  { name: 'Blog', href: '/blog', icon: NewspaperIcon },
+  { name: 'Community', href: '/community', icon: ChatBubbleLeftRightIcon },
+  { name: 'Resources', href: '/resources', icon: BookOpenIcon },
+  { name: 'FAQ', href: '/faq', icon: QuestionMarkCircleIcon },
+  { name: 'About Us', href: '/about', icon: RocketLaunchIcon },
+];
 
 export function Navigation({ excludePaths = [] }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,48 +55,6 @@ export function Navigation({ excludePaths = [] }: NavigationProps) {
 
   if (!mounted || shouldExclude) return null;
 
-  if (!mounted) {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between h-24">
-            <div className="flex items-center h-24">
-              <Link href="/" className="flex items-center">
-                <Logo width={250} height={100} />
-              </Link>
-            </div>
-
-
-            <div className="hidden md:flex items-center space-x-8">
-              <NavLink href="/#features">Features</NavLink>
-              <NavLink href="/#pricing">Pricing</NavLink>
-              <NavLink href="/dj">DJs</NavLink>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-4">
-              <Link
-                href="/login"
-                className="text-gray-300 hover:text-red-500 px-4 py-2.5 transition-all duration-200 hover:scale-105 text-base"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-red-500/20 hover:scale-105 text-base"
-              >
-                Get Started
-              </Link>
-            </div>
-
-            <button className="md:hidden p-2.5 rounded-lg hover:bg-white/10 text-white transition-colors duration-200">
-              <Bars3Icon className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </nav>
-    );
-  }
-
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled ? 'bg-black/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
@@ -90,11 +71,17 @@ export function Navigation({ excludePaths = [] }: NavigationProps) {
               <Logo width={100} height={100} className="object-contain" />
             </Link>
           </motion.div>
+
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink href="/#features">Features</NavLink>
-            <NavLink href="/#pricing">Pricing</NavLink>
-            <NavLink href="/dj">DJs</NavLink>
+            {menuItems.map((item) => (
+              <NavLink key={item.name} href={item.href}>
+                <span className="flex items-center">
+                  {item.icon && <item.icon className="w-4 h-4 mr-2" />}
+                  {item.name}
+                </span>
+              </NavLink>
+            ))}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -137,15 +124,18 @@ export function Navigation({ excludePaths = [] }: NavigationProps) {
             >
               <div className="py-3 border-t border-white/10 bg-black/95 backdrop-blur-lg rounded-lg">
                 <div className="flex flex-col space-y-2">
-                  <MobileNavLink href="/#features" onClick={() => setMobileMenuOpen(false)}>
-                    Features
-                  </MobileNavLink>
-                  <MobileNavLink href="/#pricing" onClick={() => setMobileMenuOpen(false)}>
-                    Pricing
-                  </MobileNavLink>
-                  <MobileNavLink href="/dj" onClick={() => setMobileMenuOpen(false)}>
-                    DJs
-                  </MobileNavLink>
+                  {menuItems.map((item) => (
+                    <MobileNavLink 
+                      key={item.name} 
+                      href={item.href} 
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="flex items-center">
+                        {item.icon && <item.icon className="w-5 h-5 mr-3" />}
+                        {item.name}
+                      </span>
+                    </MobileNavLink>
+                  ))}
                   <div className="pt-2 flex flex-col space-y-2 px-3">
                     <Link
                       href="/login"

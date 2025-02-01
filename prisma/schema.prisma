@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -5,86 +8,6 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
-}
-
-model User {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String      @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?     // Make password optional for social login
-  role          Role        @default(USER)
-  profile       Profile?
-  mixes         Mix[]
-  comments      Comment[]
-  memberships   Membership[]
-  accounts      Account[]   // Add this line
-  sessions      Session[]   // Add this line
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-model Profile {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @unique @db.ObjectId
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  username      String    @unique
-  bio          String?
-  genre        String[]
-  location     String?
-  avatar       String?
-  coverImage   String?
-  socialLinks  Json?     // Store social media links
-  equipment    String?   // DJ equipment/setup
-  experience   String?
-  followers    String[]  @db.ObjectId  // Array of follower user IDs
-  following    String[]  @db.ObjectId  // Array of following user IDs
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-}
-
-model Mix {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
-  description   String?
-  audioUrl      String    // URL to stored audio file
-  coverImage    String?   // URL to mix cover image
-  genre         String[]
-  duration      Int       // Duration in seconds
-  userId        String    @db.ObjectId
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes         String[]  @db.ObjectId  // Array of user IDs who liked
-  comments      Comment[]
-  plays         Int       @default(0)
-  isPublic      Boolean   @default(true)
-  tags          String[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Comment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  mixId     String   @db.ObjectId
-  mix       Mix      @relation(fields: [mixId], references: [id], onDelete: Cascade)
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Membership {
-  id            String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String           @db.ObjectId
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan          MembershipPlan
-  stripeId      String?         // Stripe subscription ID
-  status        MembershipStatus @default(ACTIVE)
-  startDate     DateTime        @default(now())
-  endDate       DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
 }
 
 model Account {
@@ -112,6 +35,112 @@ model Session {
   userId       String   @db.ObjectId
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role         @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  mixes         Mix[]
+  likes         Like[]
+  comments      Comment[]
+  playHistory   PlayHistory[]
+  profile       Profile?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Profile {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @db.ObjectId
+  username      String?   @unique
+  avatar        String?
+  bio           String?
+  location      String?
+  website       String?
+  soundcloud    String?
+  twitter       String?
+  instagram     String?
+  experience    String?
+  followers     String[]   @db.ObjectId
+  following     String[]   @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([userId])
+}
+
+model Mix {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  audioUrl    String
+  coverImage  String?
+  genre       String[]
+  duration    Int          // Duration in seconds
+  plays       Int          @default(0)
+  isPublic    Boolean      @default(true)
+  tags        String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userId      String       @db.ObjectId
+  user        User         @relation(fields: [userId], references: [id])
+  likes       Like[]
+  comments    Comment[]
+  playHistory PlayHistory[]
+
+  @@index([userId])
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  mixId     String   @db.ObjectId
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  mix       Mix      @relation(fields: [mixId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mixId, userId])
+}
+
+model Comment {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  mixId     String    @db.ObjectId
+  userId    String    @db.ObjectId
+  parentId  String?   @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  mix       Mix       @relation(fields: [mixId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentToComment")
+  likes     String[]  @db.ObjectId
+
+  @@index([mixId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model PlayHistory {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  mixId      String   @db.ObjectId
+  userId     String?  @db.ObjectId
+  identifier String
+  createdAt  DateTime @default(now())
+  mix        Mix      @relation(fields: [mixId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([mixId])
+  @@index([userId])
+  @@index([identifier])
+  @@index([createdAt])
 }
 
 model VerificationToken {

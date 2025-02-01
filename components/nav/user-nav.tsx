@@ -18,7 +18,7 @@ import {
   Disc,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function UserNav() {
   const { data: session } = useSession();
@@ -87,9 +87,12 @@ export function UserNav() {
           {/* User Menu */}
           <Menu as="div" className="relative">
             <Menu.Button className="flex items-center focus:outline-none">
-            <Avatar className="h-8 w-8">
-                        <AvatarImage src={userImage} alt={userName} />
-                    </Avatar>
+              <Avatar className="h-8 w-8 ring-2 ring-red-500/20 hover:ring-red-500/40 transition-all">
+                <AvatarImage src={userImage || '/avatars/default.png'} alt={userName} />
+                <AvatarFallback className="bg-red-100 text-red-600">
+                  {userName?.charAt(0)?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
             </Menu.Button>
 
             <Transition
@@ -101,14 +104,17 @@ export function UserNav() {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-visible">
+              <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-xl bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                 <div className="px-4 py-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src={userImage} alt={userName} />
+                  <div className="flex items-center gap-3 mb-3">
+                    <Avatar className="h-10 w-10 ring-2 ring-red-500/20">
+                      <AvatarImage src={userImage || '/avatars/default.png'} alt={userName} />
+                      <AvatarFallback className="bg-red-100 text-red-600">
+                        {userName?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <p className="text-sm font-medium">{userName}</p>
+                      <p className="text-sm font-semibold text-gray-900">{userName}</p>
                       {userEmail && (
                         <p className="text-xs text-gray-500 truncate max-w-[180px]">
                           {userEmail}
@@ -122,8 +128,8 @@ export function UserNav() {
                       <Link
                         href="/dj/profile"
                         className={`${
-                          active ? 'bg-red-50 text-red-600' : 'text-gray-900'
-                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          active ? 'bg-red-50 text-red-600' : 'text-gray-700'
+                        } group flex w-full items-center rounded-md px-3 py-2 text-sm transition-colors`}
                       >
                         <Headphones className="mr-2 h-4 w-4" />
                         DJ Profile
@@ -136,8 +142,8 @@ export function UserNav() {
                       <Link
                         href="/settings"
                         className={`${
-                          active ? 'bg-red-50 text-red-600' : 'text-gray-900'
-                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          active ? 'bg-red-50 text-red-600' : 'text-gray-700'
+                        } group flex w-full items-center rounded-md px-3 py-2 text-sm transition-colors`}
                       >
                         <Settings className="mr-2 h-4 w-4" />
                         Settings
@@ -152,8 +158,8 @@ export function UserNav() {
                       <button
                         onClick={() => signOut({ callbackUrl: '/login' })}
                         className={`${
-                          active ? 'bg-red-50' : ''
-                        } group flex w-full items-center rounded-md px-2 py-2 text-sm text-red-600`}
+                          active ? 'bg-red-50 text-red-600' : 'text-red-600'
+                        } group flex w-full items-center rounded-md px-3 py-2 text-sm transition-colors`}
                       >
                         <LogOut className="mr-2 h-4 w-4" />
                         Log out

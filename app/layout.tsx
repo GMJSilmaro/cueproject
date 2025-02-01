@@ -6,7 +6,7 @@ import { Providers } from "@/components/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CueProject - DJ Mix Sharing Platform",
+  title: "Cue Project DJ's - Mix Sharing Platform",
   description: "Share and discover DJ mixes from around the world",
 };
 

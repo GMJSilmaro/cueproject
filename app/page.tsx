@@ -1,14 +1,39 @@
 'use client'
 
+import { Navigation } from "@/components/common/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MusicalNoteIcon, UserGroupIcon, ChartBarIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
+import { 
+  MusicalNoteIcon, 
+  UserGroupIcon, 
+  ChartBarIcon, 
+  ArrowDownIcon,
+  CalendarIcon,
+  NewspaperIcon,
+  QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon,
+  BookOpenIcon,
+  RocketLaunchIcon
+} from "@heroicons/react/24/outline";
+
+// Add this at the top of your component
+const menuItems = [
+  { name: 'Features', href: '#features' },
+  { name: 'Pricing', href: '#pricing' },
+  { name: 'DJs', href: '/djs' },
+  { name: 'Events', href: '/events', icon: CalendarIcon },
+  { name: 'Blog', href: '/blog', icon: NewspaperIcon },
+  { name: 'Community', href: '/community', icon: ChatBubbleLeftRightIcon },
+  { name: 'Resources', href: '/resources', icon: BookOpenIcon },
+  { name: 'FAQ', href: '/faq', icon: QuestionMarkCircleIcon },
+  { name: 'About Us', href: '/about', icon: RocketLaunchIcon },
+];
 
 export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center bg-black overflow-hidden">
+      <section className="relative min-h-screen flex items-center bg-black overflow-hidden pt-14">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 via-transparent to-purple-500/20" />
@@ -79,172 +104,168 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-32 bg-neutral-900 relative overflow-hidden">
+
+      {/* Testimonials Section */}
+      <section className="py-32 bg-neutral-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
         <div className="container mx-auto px-4 relative">
-          <motion.div 
-            className="max-w-5xl mx-auto"
+          <motion.div
+            className="max-w-6xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-20 text-white">
-              Everything You Need to Succeed
+              What DJs Are Saying
             </h2>
-            <div className="grid md:grid-cols-3 gap-16">
-              {[
-                {
-                  icon: MusicalNoteIcon,
-                  title: "Professional Profile",
-                  description: "Create your professional DJ profile, showcase your work, and build your brand."
-                },
-                {
-                  icon: UserGroupIcon,
-                  title: "Growing Community",
-                  description: "Connect with other DJs, share experiences, and grow together."
-                },
-                {
-                  icon: ChartBarIcon,
-                  title: "Analytics & Insights",
-                  description: "Track your growth with detailed analytics and audience insights."
-                }
-              ].map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  className="group"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2, duration: 0.5 }}
-                >
-                  <div className="mb-6 p-6 bg-gradient-to-br from-black/80 to-black/40 rounded-xl group-hover:from-red-950/80 group-hover:to-red-900/40 transition-colors duration-500 border border-red-500/20 transform group-hover:scale-105">
-                    <feature.icon className="w-8 h-8 text-red-500" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-4 text-white">{feature.title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-                </motion.div>
-              ))}
+            
+            <div className="relative">
+        
+              {/* Define testimonials array once */}
+              {(() => {
+                const testimonials = [
+                  {
+                    quote: "This platform has completely transformed how I connect with my audience. The analytics tools are invaluable!",
+                    author: "DJ Maxwell",
+                    role: "House Music DJ",
+                    location: "London, UK"
+                  },
+                  {
+                    quote: "The best platform for DJs to showcase their work. The community here is incredibly supportive and engaging.",
+                    author: "Sarah Beats",
+                    role: "EDM Producer",
+                    location: "Berlin, DE"
+                  },
+                  {
+                    quote: "From booking gigs to growing my fanbase, this platform has been instrumental in my success.",
+                    author: "DJ Phoenix",
+                    role: "Tech House DJ",
+                    location: "Miami, US"
+                  },
+                  {
+                    quote: "The networking opportunities here are unmatched. I've collaborated with amazing artists worldwide.",
+                    author: "Bass Queen",
+                    role: "Drum & Bass DJ",
+                    location: "Amsterdam, NL"
+                  },
+                  {
+                    quote: "Outstanding platform for both emerging and established DJs. The features are exactly what we need.",
+                    author: "Mike Rhythm",
+                    role: "Progressive House DJ",
+                    location: "Sydney, AU"
+                  },
+                  {
+                    quote: "The event management tools have made organizing my gigs so much easier. Highly recommended!",
+                    author: "Luna Groove",
+                    role: "Techno DJ",
+                    location: "Barcelona, ES"
+                  }
+                ];
+
+                return (
+                  <>
+                    <motion.div 
+                      className="flex gap-6 py-4"
+                      animate={{
+                        x: [0, -1920],
+                      }}
+                      transition={{
+                        x: {
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          duration: 30,
+                          ease: "linear",
+                        },
+                      }}
+                    >
+                      {testimonials.map((testimonial, index) => (
+                        <motion.div
+                          key={testimonial.author}
+                          className="min-w-[400px] bg-black/50 p-8 rounded-xl backdrop-blur-sm border border-red-500/10 hover:border-red-500/30 transition-all duration-300"
+                          whileHover={{ scale: 1.02, borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                        >
+                          <div className="flex items-center mb-6">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-red-500 to-red-700 flex items-center justify-center text-white font-bold">
+                              {testimonial.author.charAt(0)}
+                            </div>
+                            <div className="ml-4">
+                              <h4 className="text-lg font-semibold text-white">{testimonial.author}</h4>
+                              <p className="text-red-400">{testimonial.role}</p>
+                              <p className="text-sm text-gray-400">{testimonial.location}</p>
+                            </div>
+                          </div>
+                          <p className="text-gray-300 italic">"{testimonial.quote}"</p>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+
+                    {/* Duplicate for seamless loop */}
+                    <motion.div 
+                      className="flex gap-6 py-4"
+                      animate={{
+                        x: [-1920, 0],
+                      }}
+                      transition={{
+                        x: {
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          duration: 30,
+                          ease: "linear",
+                        },
+                      }}
+                    >
+                     
+                    </motion.div>
+                  </>
+                );
+              })()}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-32 bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-red-950/20 to-transparent" />
+      {/* CTA Section */}
+      <section className="py-20 bg-black relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-purple-500/10" />
+        </div>
         <div className="container mx-auto px-4 relative">
-          <motion.div 
-            className="max-w-5xl mx-auto"
+          <motion.div
+            className="max-w-4xl mx-auto text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-20 text-white">
-              Choose Your Plan
+            <h2 className="text-4xl md:text-6xl font-bold mb-8 text-white">
+              Ready to Amplify Your DJ Career?
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Free Plan */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="group bg-neutral-900/80 backdrop-blur-sm p-8 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-all duration-500 hover:transform hover:scale-105"
+            <p className="text-xl text-gray-300 mb-12">
+              Join thousands of DJs who are already growing their careers with us.
+              Start your journey today!
+            </p>
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <Link
+                href="/register"
+                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-red-500/20 transform hover:scale-105"
               >
-                <h3 className="text-2xl font-bold mb-4 text-white">Free</h3>
-                <p className="text-4xl font-bold mb-8 text-white">$0<span className="text-lg text-gray-400">/mo</span></p>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Basic DJ profile
-                  </li>
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Up to 3 mixes
-                  </li>
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Community access
-                  </li>
-                </ul>
-                <Link
-                  href="/register"
-                  className="block w-full py-3 px-4 rounded-lg text-center font-semibold bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 transform group-hover:scale-105"
-                >
-                  Get Started
-                </Link>
-              </motion.div>
-
-              {/* Pro Plan */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="relative group transform hover:scale-105 transition-all duration-500"
+                Get Started Now
+              </Link>
+              <Link
+                href="/contact"
+                className="bg-white/10 text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/20 transition-all duration-200 backdrop-blur-sm transform hover:scale-105"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-red-700 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-                <div className="relative bg-black p-8 rounded-xl">
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm px-3 py-1 rounded-full font-semibold">
-                    Most Popular
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">Pro</h3>
-                  <p className="text-4xl font-bold mb-8 text-white">$9.99<span className="text-lg text-red-200">/mo</span></p>
-                  <ul className="space-y-4 mb-8">
-                    <li className="flex items-center text-white">
-                      <span className="mr-2">✓</span> Enhanced DJ profile
-                    </li>
-                    <li className="flex items-center text-white">
-                      <span className="mr-2">✓</span> Unlimited mixes
-                    </li>
-                    <li className="flex items-center text-white">
-                      <span className="mr-2">✓</span> Analytics dashboard
-                    </li>
-                    <li className="flex items-center text-white">
-                      <span className="mr-2">✓</span> Priority support
-                    </li>
-                  </ul>
-                  <Link
-                    href="/register"
-                    className="block w-full py-3 px-4 rounded-lg text-center font-semibold bg-white text-red-600 hover:bg-gray-100 transition-all duration-200 transform group-hover:scale-105"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              </motion.div>
-
-              {/* Premium Plan */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                className="group bg-neutral-900/80 backdrop-blur-sm p-8 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-all duration-500 hover:transform hover:scale-105"
-              >
-                <h3 className="text-2xl font-bold mb-4 text-white">Premium</h3>
-                <p className="text-4xl font-bold mb-8 text-white">$19.99<span className="text-lg text-gray-400">/mo</span></p>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Custom branding
-                  </li>
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Unlimited everything
-                  </li>
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> Advanced analytics
-                  </li>
-                  <li className="flex items-center text-gray-400">
-                    <span className="mr-2 text-red-500">✓</span> 24/7 support
-                  </li>
-                </ul>
-                <Link
-                  href="/register"
-                  className="block w-full py-3 px-4 rounded-lg text-center font-semibold bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 transform group-hover:scale-105"
-                >
-                  Get Started
-                </Link>
-              </motion.div>
-            </div>
+                Contact Sales
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>

@@ -70,8 +70,13 @@ export function RegisterForm() {
         throw new Error(error || 'Failed to register')
       }
 
-      toast.success('Registration successful! Please sign in.')
-      router.push('/login')
+      toast.success('Account created successfully! Redirecting to login...', {
+        duration: 3000,
+      })
+      
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong during registration')
     } finally {

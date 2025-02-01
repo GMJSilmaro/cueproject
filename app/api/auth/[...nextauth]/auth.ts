@@ -114,6 +114,13 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allows relative URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
     async signIn({ user, account }: { 
       user: NextAuthUser; 
       account: Account | null; 
