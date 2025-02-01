@@ -7,13 +7,15 @@ const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000', 'cueprojectdjs-git-main-gilberts-projects-584a51b2.vercel.app', 'https://cueprojectdjs.vercel.app']
-    }
+    },
+    optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
+    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = [...(config.externals || []), '@prisma/client', 'bcrypt'];
     }
-    config.resolve.alias['@radix-ui/react-select'] = require('path').resolve(__dirname, 'node_modules/@radix-ui/react-select');
+    config.resolve.alias['@radix-ui/react-select'] = new URL('./node_modules/@radix-ui/react-select', import.meta.url).pathname;
     return config;
   },
   images: {
@@ -25,8 +27,7 @@ const nextConfig = {
         pathname: '/a/**',
       },
     ],
-  },
-  poweredByHeader: false,
+  }
 };
 
-module.exports = nextConfig; 
+export default nextConfig; 

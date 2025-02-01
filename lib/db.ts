@@ -1,5 +1,6 @@
 // @ts-expect-error - Prisma Client is not available during build time but will be available at runtime
 import { PrismaClient } from '@prisma/client'
+import { global } from 'styled-jsx/css'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
