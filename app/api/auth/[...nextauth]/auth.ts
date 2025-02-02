@@ -1,5 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
-import type { DefaultSession, Account, Session, User as NextAuthUser } from "next-auth";
+import type { DefaultSession, Account, Session } from "next-auth";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -17,25 +17,22 @@ declare module "next-auth" {
     user: {
       id: string;
       role: Role;
+      provider?: string;
     } & DefaultSession["user"]
-  }
-
-  interface User {
-    readonly id: string;
-    email: string;
-    role: Role;
   }
 }
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
+  debug: process.env.NODE_ENV === 'development',
   session: {
-    strategy: "jwt" as const, 
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: '/login',
-    error: '/auth/error',
+    error: '/login',
+    signOut: '/',
   },
   theme: {
     colorScheme: 'light',
@@ -60,19 +57,13 @@ export const authOptions: NextAuthOptions = {
         params: {
           prompt: "select_account",
           access_type: "offline",
-          response_type: "code",
-          scope: "openid email profile"
+          response_type: "code"
         }
       }
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID ?? "",
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? "",
-      authorization: {
-        params: {
-          scope: "email,public_profile"
-        }
-      }
     }),
     CredentialsProvider({
       name: "credentials",
@@ -82,17 +73,28 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          throw new Error("Please enter your email and password");
         }
 
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email
-          }
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            password: true,
+          },
         });
 
-        if (!user || !user.password) {
-          throw new Error("No user found");
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
+
+        if (!user.password) {
+          throw new Error("Please login with your social account");
         }
 
         const isPasswordValid = await compare(
@@ -114,35 +116,34 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      // Allows relative URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
-    },
-    async signIn({ user, account }: { 
-      user: NextAuthUser; 
-      account: Account | null; 
-    }) {
-      if (account?.provider === "google" || account?.provider === "facebook") {
-        if (!user.email) return false;
+    async signIn({ user, account }) {
+      if (!user?.email) {
+        throw new Error("No email associated with this account");
+      }
 
-        try {
+      try {
+        if (account?.provider === "google" || account?.provider === "facebook") {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email },
-            include: { accounts: true }
+            include: { accounts: true, profile: true }
           });
 
           if (existingUser) {
-            // If user exists but doesn't have this provider account, create it
-            const accounts = existingUser.accounts as Array<{ provider: string }>;
-            const hasProvider = accounts?.some(acc => acc.provider === account.provider);
-            if (!hasProvider) {
+            if (!existingUser.profile) {
+              await prisma.profile.create({
+                data: {
+                  userId: existingUser.id,
+                  username: user.name || `user_${existingUser.id.slice(0, 8)}`,
+                },
+              });
+            }
+
+            const hasProvider = existingUser.accounts?.some(acc => acc.provider === account.provider);
+            if (!hasProvider && account) {
               await prisma.account.create({
                 data: {
                   userId: existingUser.id,
-                  type: account.type,
+                  type: account.type ?? "oauth",
                   provider: account.provider,
                   providerAccountId: account.providerAccountId,
                   access_token: account.access_token,
@@ -153,59 +154,59 @@ export const authOptions: NextAuthOptions = {
                 },
               });
             }
-            return true;
+          } else {
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || null,
+                image: user.image || null,
+                role: "USER",
+                profile: {
+                  create: {
+                    username: user.name || `user_${Date.now().toString(36)}`,
+                  }
+                }
+              },
+            });
           }
-
-          // If no user exists, create new user
-          const newUser = await prisma.user.create({
-            data: {
-              email: user.email,
-              name: user.name ?? null,
-              image: user.image ?? null,
-              role: "USER",
-              password: null,
-            },
-          });
-
-          await prisma.profile.create({
-            data: {
-              userId: newUser.id,
-              username: user.name || `user_${newUser.id.slice(0, 8)}`,
-            },
-          });
-
-          return true;
-        } catch (error) {
-          console.error("Error in signIn callback:", error);
-          return false;
         }
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
       }
-      return true;
     },
-    async session({ token, session }: { 
-      token: JWT; 
-      session: Session 
-    }) {
+    async redirect({ url, baseUrl }) {
+      // If the URL is relative, make it absolute
+      if (url.startsWith('/')) {
+        url = new URL(url, baseUrl).toString();
+      }
+      // Allow redirects to the same domain
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // Default redirect to dashboard
+      return `${baseUrl}/dashboard`;
+    },
+    async session({ token, session }) {
       if (token && session.user) {
         session.user.id = token.sub ?? "";
         session.user.name = token.name ?? null;
-        session.user.email = token.email ?? "";
+        session.user.email = token.email ?? null;
         session.user.role = (token.role as Role) ?? "USER";
         session.user.image = token.picture ?? null;
+        session.user.provider = token.provider as string ?? null;
       }
       return session;
     },
-    async jwt({ token, user, account }: { 
-      token: JWT; 
-      user?: NextAuthUser; 
-      account?: Account | null 
-    }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.sub = user.id;
-        token.role = user.role ?? "USER";
+        token.role = (user as any).role ?? "USER";
       }
       if (account) {
         token.accessToken = account.access_token;
+        token.provider = account.provider;
       }
       return token;
     }

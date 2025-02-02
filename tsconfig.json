@@ -28,7 +28,15 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/api/**/*.ts"
+    "app/api/**/*.ts",
+    "types/**/*.d.ts",
+    "components/**/*.tsx",
+    "components/**/*.ts",
+    "lib/**/*.ts",
+    "app/**/*.tsx",
+    "app/**/*.ts",
+    "prisma/**/*.ts",
+    
   ],
   "exclude": ["node_modules"]
 }

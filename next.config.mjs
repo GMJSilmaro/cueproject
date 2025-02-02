@@ -9,20 +9,28 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
   },
   output: 'standalone',
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...(config.externals || []), '@prisma/client', 'bcrypt'];
-    }
-    return config;
-  },
   images: {
-    domains: ['picsum.photos', 'api.dicebear.com', 'lh3.googleusercontent.com'],
+    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
       },
     ],
+  },
+  webpack: (config) => {
+    if (!config.externals) {
+      config.externals = [];
+    }
+    if (Array.isArray(config.externals)) {
+      config.externals = [...config.externals, '@prisma/client', 'bcrypt'];
+    }
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    });
+    return config;
   },
   // Ensure CSS/SCSS modules are handled properly
   sassOptions: {

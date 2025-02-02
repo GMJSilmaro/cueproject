@@ -1,19 +1,8 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
-// @ts-expect-error - Prisma Client is not available during build time but will be available at runtime
-import { PrismaClient } from '@prisma/client'
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface Global {
-      prisma: PrismaClient
-    }
-  }
-}
-
 import * as z from "zod";
+
 const registerSchema = z.object({
   username: z.string().min(3).max(20),
   email: z.string().email(),
@@ -48,34 +37,36 @@ export async function POST(req: Request) {
     const hashedPassword = await hash(password, 12);
 
     // Create user and profile in a transaction
-    const result = await prisma.$transaction(async (prisma: PrismaClient) => {
-      // Create user
-      const user = await prisma.user.create({
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
         data: {
           email,
           password: hashedPassword,
           role,
-          name: username, // Use username as initial name
+          name: username,
+          profile: {
+            create: {
+              username,
+            },
+          },
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          profile: true,
         },
       });
 
-      // Create profile
-      const profile = await prisma.profile.create({
-        data: {
-          userId: user.id,
-          username,
-          genre: role === "DJ" ? ["House"] : [], // Default genre for DJs
-        },
-      });
-
-      return { user, profile };
+      return user;
     });
 
     return NextResponse.json({
       user: {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
+        id: result.id,
+        email: result.email,
+        name: result.name,
       },
     });
   } catch (error) {

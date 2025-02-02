@@ -108,7 +108,7 @@ export interface FormattedMix {
   description: string | null;
   audioUrl: string;
   coverUrl: string | null;
-  genre: string[];
+  genre: string;
   duration: number;
   plays: number;
   isPublic: boolean;
