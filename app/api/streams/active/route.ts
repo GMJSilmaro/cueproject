@@ -3,6 +3,8 @@ import { Video } from '@/lib/mux'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 
+export const dynamic = 'force-dynamic'
+
 interface MuxStreamWithMetadata {
   id: string
   status: string
