@@ -39,22 +39,21 @@ const setStoredStreamData = (data: any) => {
 export function StreamSetup() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [isChecking, setIsChecking] = useState(true)
+  const [isChecking, setIsChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [streamKey, setStreamKey] = useState<string | null>(null)
-  const [streamId, setStreamId] = useState<string | null>(null)
-  const [isStreamActive, setIsStreamActive] = useState(false)
+  const [streamKey, setStreamKey] = useState<string | null>(() => {
+    const stored = getStoredStreamData()
+    return stored?.streamKey || null
+  })
+  const [streamId, setStreamId] = useState<string | null>(() => {
+    const stored = getStoredStreamData()
+    return stored?.streamId || null
+  })
+  const [isStreamActive, setIsStreamActive] = useState<boolean>(() => {
+    const stored = getStoredStreamData()
+    return stored?.isStreamActive || false
+  })
   const [showStreamKey, setShowStreamKey] = useState(false)
-
-  // Initialize state from local storage
-  useEffect(() => {
-    const storedData = getStoredStreamData()
-    if (storedData) {
-      setStreamKey(storedData.streamKey)
-      setStreamId(storedData.streamId)
-      setIsStreamActive(storedData.isStreamActive)
-    }
-  }, [])
 
   // Check for existing active streams on mount and periodically
   useEffect(() => {
@@ -296,6 +295,12 @@ export function StreamSetup() {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
+                {isChecking && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    <Loader2 className="h-3 w-3 animate-spin inline mr-1" />
+                    Verifying stream status...
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
